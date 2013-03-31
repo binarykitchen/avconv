@@ -50,7 +50,7 @@ stderr is rarely used. only if there is a unix-related problem about spawning pr
 
 ### avconv(params, callback)
 
-avconv spawns a new avconv process with any given parameters. it does not validate the parameter nor the results. that's all up to you.
+avconv spawns a new avconv process with any given parameters. it does not validate the parameters nor mess with the results. that's all up to you.
  
 __arguments__
 
