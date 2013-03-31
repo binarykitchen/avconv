@@ -1,0 +1,31 @@
+{
+    "name": "avconv",
+    "version": "0.0.1",
+    "description": "simply spawns an avconv process with any parameters and returns the result to you. very small, fast, clean and does only this.",
+    "main": "avconv.js",
+    "author": "Michael Heuberger <michael.heuberger@binarykitchen.com>",
+    "keywords": [
+        "avconv",
+        "video conversion",
+        "video encoding"
+    ],
+    "devDependencies": {
+        "nodeunit": "*"
+    },
+    "dependencies": null,
+    "engines": {
+        "node": ">=0.8"
+    },
+    "scripts": {
+        "test": "nodeunit tests/basics.js"
+    },
+    "repository": {
+        "type": "git",
+        "url":  "https://github.com/binarykitchen/avconv.git"
+    },
+    "license": "MIT",
+    "readmeFilename": "README.md",
+    "directories": {
+        "test": "tests"
+    }
+}
