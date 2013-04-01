@@ -41,10 +41,10 @@ function callback(code, stdout, stderr) {
 }
 ```
 
-an exit code = 0 (zero) means there was no problem. an exit code of 127 means the program avconv could not be found. i recommend you to use a switch block to deal with the exit code.
+an exit code = 0 (zero) means there was no problem. an exit code of 127 means the program avconv could not be found. i recommend you to use a switch block to deal with various exit codes.
 
-stdout might contain any useful information, depending on the log level. beware that stdout may contain warnings or errors coming from avconv.
-stderr is rarely used. only if there is a unix-related problem about spawning processes, memory etc, it will have some useful information.
+depending on the log level, stdout might contain any useful information. beware that stdout may contain warnings or errors coming from avconv.
+stderr is rarely filled. only if there was an unix-related problem about spawning processes, memory etc.
 
 ## api
 

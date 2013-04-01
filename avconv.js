@@ -8,7 +8,7 @@ function avconv(params, callback) {
         , stderr = ''
         , avconv = spawn('avconv', params);
 
-    // avconv output is always written into stderr
+    // general avconv output is always written into stderr
     if (avconv.stderr)
         avconv.stderr.on('data', function(data) {
             // write it into stdout instead
