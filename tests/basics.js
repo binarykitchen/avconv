@@ -50,7 +50,7 @@ module.exports = testCase({
                 
                 t.strictEqual(code, 1, 'avconv did nothing');
                 t.notEqual(stdout, "", 'stdout is not empty and contains a warning about the wrong parameter');
-                t.equal(stderr, "", 'stderr is still empty');
+                t.strictEqual(stderr, "", 'stderr is still empty');
                 t.done();
             });            
         }
@@ -62,7 +62,7 @@ module.exports = testCase({
 
                 t.strictEqual(code, 0, 'avconv returned help');
                 t.notEqual(stdout, "", 'stdout contains help');
-                t.equal(stderr, "", 'stderr is still empty');
+                t.strictEqual(stderr, "", 'stderr is still empty');
                 t.done();
             });
         }
