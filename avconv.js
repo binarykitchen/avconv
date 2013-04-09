@@ -11,16 +11,20 @@ function avconv(params) {
     stream.readable = true;
 
     // general avconv output is always written into stderr
-    if (avconv.stderr)
+    if (avconv.stderr) {
+        avconv.stderr.setEncoding('utf8');
         avconv.stderr.on('data', function(data) {
             stream.emit('data', data);
         });
+    }
 
     // just in case if there is something interesting
-    if (avconv.stdout)
+    if (avconv.stdout) {
+        avconv.stdout.setEncoding('utf8');
         avconv.stdout.on('data', function(data) {
             stream.emit('data', data);
         });
+    }
 
     avconv.on('error', function(data) {
         stream.emit('error', data);

@@ -1,6 +1,6 @@
 {
     "name": "avconv",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "description": "simply spawns an avconv process with any parameters and *streams* the result to you. very small, fast, clean and does only this.",
     "main": "avconv.js",
     "author": "Michael Heuberger <michael.heuberger@binarykitchen.com>",
