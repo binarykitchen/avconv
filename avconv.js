@@ -1,37 +1,37 @@
 module.exports = avconv;
 
-var spawn = require('child_process').spawn;
+var   spawn = require('child_process').spawn
+    , Stream = require('stream');
 
-function avconv(params, callback) {
+function avconv(params) {
     
-    var   stdout = ''
-        , stderr = ''
+    var   stream = new Stream()
         , avconv = spawn('avconv', params);
+
+    stream.readable = true;
 
     // general avconv output is always written into stderr
     if (avconv.stderr)
         avconv.stderr.on('data', function(data) {
-            // write it into stdout instead
-            stdout += data;
+            stream.emit('data', data);
         });
 
     // just in case if there is something interesting
     if (avconv.stdout)
         avconv.stdout.on('data', function(data) {
-            stdout += data;
+            stream.emit('data', data);
         });
 
     avconv.on('error', function(data) {
-        if (data.length)
-            data += ' ';
-        
-        stderr += data;
+        stream.emit('error', data);
     });
 
     // new stdio api introduced the exit event not waiting for open pipes
     var eventType = avconv.stdio ? 'close' : 'exit';
     
-    avconv.on(eventType, function(code) {
-        callback(code, stdout, stderr);
+    avconv.on(eventType, function(exitCode) {
+        stream.emit('end', exitCode);
     });
+    
+    return stream;
 }
