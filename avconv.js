@@ -1,3 +1,5 @@
+"use strict";
+
 module.exports = avconv;
 
 var   spawn = require('child_process').spawn
