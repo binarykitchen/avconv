@@ -127,19 +127,27 @@ module.exports = testCase({
         'convert pokemon flv to webm': function(t) {
 
             var params = [
-                '-i',           path.join(this.exampleDir, 'pokemon_card.flv'),
-                '-c:v',         'libvpx',
-                '-deadline',    'realtime',
-                '-y',           path.join(this.exampleDir, 'pokemon_card.webm'),
+                    '-i',           path.join(this.exampleDir, 'pokemon_card.flv')
+                ,   '-c:v',         'libvpx'
+                ,   '-deadline',    'realtime'
+                ,   '-y',           path.join(this.exampleDir, 'pokemon_card.webm')
             ];
 
             var     errors = ''
-                ,   datas   = '';
+                ,   datas   = ''
+                ,   previousProgress = 0;
 
             var stream = avconv(params);
 
             stream.on('data', function(data) {
                 datas += data;
+            });
+
+            stream.on('progress', function(progress) {
+                t.ok(progress > previousProgress,   'Progress has been made');
+                t.ok(progress <= 1,                 'Progress is never over 100%');
+
+                previousProgress = progress;
             });
 
             stream.on('error', function(data) {
@@ -148,8 +156,8 @@ module.exports = testCase({
 
             stream.once('end', function(exitCode) {
 
-                t.strictEqual(exitCode,           0,    'Video %s has been successfully generated');
-                t.strictEqual(errors,             '',   'No errors occured at all');
+                t.strictEqual(exitCode, 0,    'Video has been successfully generated');
+                t.strictEqual(errors,   '',   'No errors occured at all');
 
                 t.ok(datas.length > 0, 'There is data');
 

@@ -2,6 +2,8 @@
 
 Simply spawns an avconv process with any parameters and *streams* the result to you. Very small, fast, clean and does only this.
 
+It also keeps you informed about the progress by emitting events. That's a very unique function of this module.
+
 ## Installation
 
 To install avconv, use [npm](http://github.com/isaacs/npm):
@@ -35,8 +37,9 @@ stream.pipe(process.stdout);
 
 * Avconv consultation is not subject of this module. If you need help with parameters, have a look at http://libav.org/avconv.html
 * Same goes with node streams. You can do anything with them you want. pipe them or listen to events. Easy.
+* But have a look at the unit tests. They contain some nice examples.
 
-### How to watch for results (output, errors, exit code)?
+### How to watch for results (progress, output, errors, exit code)?
 
 If you want to watch for errors or for exit codes from the avconv process then you should add event listeners like that:
 
@@ -49,6 +52,13 @@ stream.on('data', function(data) {
     /*
     this also would work because data is utf8 encoded.
     console.log(data);
+    */
+});
+
+stream.on('progress', function(progress) {
+    /*
+    progress is a floating number between 0 ... 1 that keeps you
+    informed about the current avconv conversion process.
     */
 });
 
@@ -82,6 +92,7 @@ __return value__
 
 * stream - a readable stream where you can attach well-known events like:
     * .on('data', function(data) {...}) - a chunk of data with useful information, depending on the log level. Any warnings or errors from avconv are there too.
+    * .on('progress', function(progress) {...}) - a floating number, 0 means conversion progress is at 0%, 1 is 100% and means, it's done. Very useful if you want to show the conversion progress on an user interface,
     * .on('error', function(data) {...}) - rarely used. Would contain issues related to the OS itself.
     * .once('end', function(exitCode) {...}) - any integer where 0 means OK. Anything above 0 indicates a problem (exit code).
 
