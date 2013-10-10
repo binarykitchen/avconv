@@ -1,7 +1,7 @@
 {
     "name": "avconv",
-    "version": "0.2.2",
-    "description": "simply spawns an avconv process with any parameters and *streams* the result to you. very small, fast, clean and does only this.",
+    "version": "0.2.3",
+    "description": "Simply spawns an avconv process with any parameters and *streams* the result to you. Very small, fast, clean and does only this.",
     "main": "avconv.js",
     "author": "Michael Heuberger <michael.heuberger@binarykitchen.com>",
     "keywords": [
@@ -10,9 +10,10 @@
         "video encoding"
     ],
     "devDependencies": {
-        "nodeunit": "*"
+        "nodeunit": "~0.8"
     },
-    "dependencies": null,
+    "dependencies": {
+    },
     "engines": {
         "node": ">=0.10.3"
     },

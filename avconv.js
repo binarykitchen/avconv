@@ -2,11 +2,11 @@
 
 module.exports = avconv;
 
-var   spawn = require('child_process').spawn
+var   spawn  = require('child_process').spawn
     , Stream = require('stream');
 
 function avconv(params) {
-    
+
     var   stream = new Stream()
         , avconv = spawn('avconv', params);
 
@@ -34,10 +34,10 @@ function avconv(params) {
 
     // new stdio api introduced the exit event not waiting for open pipes
     var eventType = avconv.stdio ? 'close' : 'exit';
-    
+
     avconv.on(eventType, function(exitCode) {
         stream.emit('end', exitCode);
     });
-    
+
     return stream;
 }
