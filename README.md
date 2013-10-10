@@ -1,8 +1,8 @@
 # avconv
 
-Simply spawns an avconv process with any parameters and *streams* the result to you. Very small, fast, clean and does only this.
+Simply spawns an avconv process with any parameters and *streams* the result + conversion progress to you. Very small, fast, clean and does only this.
 
-It also keeps you informed about the progress by emitting events. That's a very unique function of this module.
+It also keeps you informed about the progress by emitting events. That's a very unique function of this module. Link that with an UI and it will look flash.
 
 ## Installation
 
@@ -18,7 +18,7 @@ var avconv = require('avconv');
 
 ## Quick example
 
-### Make an avi video out of images
+### Encode an avi video out of images
 
 ```javascript
 var params = [
@@ -37,7 +37,7 @@ stream.pipe(process.stdout);
 
 * Avconv consultation is not subject of this module. If you need help with parameters, have a look at http://libav.org/avconv.html
 * Same goes with node streams. You can do anything with them you want. pipe them or listen to events. Easy.
-* But have a look at the unit tests. They contain some nice examples.
+* But if your're smart, then go, have a look at the unit tests. They contain some nice examples.
 
 ### How to watch for results (progress, output, errors, exit code)?
 
@@ -72,17 +72,17 @@ stream.once('end', function(exitCode) {
 });
 ```
 
-An exit code = 0 (zero) means there was no problem. An exit code of 127 means the program avconv could not be found. I recommend you to use a switch block to deal with various exit codes.
+An exit code of 0 (zero) means there was no problem. An exit code of 127 means the program avconv could not be found. I recommend you to use a switch block to deal with various exit codes.
 
 Depending on the log level you have passed onto the avconv process, the output might contain any useful information. Beware that warnings or errors from within the avconv process are still shown as normal output in the `data` event.
 
-Whereas errors from the stream are rarely filled ('error' event). They happen only when there was an unix-related problem about spawning processes, memory blabbah ...
+Whereas errors from the stream are rarely filled (`error` event). They happen only when there was an unix-related problem about spawning processes, memory blabbah ...
 
 ## API
 
 ### avconv(params)
 
-Avconv spawns a new avconv process with any given parameters. It does not validate the parameters nor mess with the results. That's all up to you.
+Avconv spawns a new avconv process with any given parameters. It does not validate the parameters nor mess with the results. That's all up to you. You would see avconv complaining about bad parameters in the `data` event anyways. So:
 
 __arguments__
 
@@ -91,10 +91,10 @@ __arguments__
 __return value__
 
 * stream - a readable stream where you can attach well-known events like:
-    * .on('data', function(data) {...}) - a chunk of data with useful information, depending on the log level. Any warnings or errors from avconv are there too.
-    * .on('progress', function(progress) {...}) - a floating number, 0 means conversion progress is at 0%, 1 is 100% and means, it's done. Very useful if you want to show the conversion progress on an user interface,
-    * .on('error', function(data) {...}) - rarely used. Would contain issues related to the OS itself.
-    * .once('end', function(exitCode) {...}) - any integer where 0 means OK. Anything above 0 indicates a problem (exit code).
+    * `.on('data', function(data) {...})` - a chunk of data with useful information, depending on the log level. Any warnings or errors from avconv are there too.
+    * `.on('progress', function(progress) {...})` - a floating number, 0 means conversion progress is at 0%, 1 is 100% and means, it's done. Very useful if you want to show the conversion progress on an user interface,
+    * `.on('error', function(data) {...})` - rarely used. Would contain issues related to the OS itself.
+    * `.once('end', function(exitCode) {...})` - any integer where 0 means OK. Anything above 0 indicates a problem (exit code).
 
 ## License
 
