@@ -26,7 +26,7 @@ function toMilliSeconds(time) {
 // Extract duration from avconv data
 function findDuration(data) {
     var     result = /duration: (\d+:\d+:\d+.\d+)/i.exec(data)
-        ,   duration = null;
+        ,   duration;
 
     if (result && result[1]) {
         duration = toMilliSeconds(result[1]);
@@ -57,7 +57,7 @@ function avconv(params) {
 
     stream.readable = true;
 
-    // general avconv output is always written into stderr
+    // General avconv output is always written into stderr
     if (avconv.stderr) {
 
         avconv.stderr.setEncoding('utf8');
@@ -79,8 +79,9 @@ function avconv(params) {
             if (duration && time) {
                 progress = time / duration;
 
-                if (progress > 1)
+                if (progress > 1) {
                     progress = 1; // Fix floating point error
+                }
 
                 // Tell the world that progress is made
                 stream.emit('progress', progress);
@@ -90,7 +91,7 @@ function avconv(params) {
         });
     }
 
-    // just in case if there is something interesting
+    // Just in case if there is something interesting
     if (avconv.stdout) {
         avconv.stdout.setEncoding('utf8');
         avconv.stdout.on('data', function(data) {
@@ -102,7 +103,7 @@ function avconv(params) {
         stream.emit('error', data);
     });
 
-    // new stdio api introduced the exit event not waiting for open pipes
+    // New stdio api introduced the exit event not waiting for open pipes
     var eventType = avconv.stdio ? 'close' : 'exit';
 
     avconv.on(eventType, function(exitCode) {
