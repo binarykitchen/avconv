@@ -1,5 +1,7 @@
 # avconv
 
+[![Build Status](https://travis-ci.org/binarykitchen/avconv.png?branch=master)](https://travis-ci.org/binarykitchen/avconv)
+
 Simply spawns an avconv process with any parameters and *streams* the result + conversion progress to you. Very small, fast, clean and does only this.
 
 It also keeps you informed about the progress by emitting events. That's a very unique function of this module. Link that with an UI and it will look flash.
