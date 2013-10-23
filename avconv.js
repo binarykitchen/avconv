@@ -1,23 +1,21 @@
 "use strict";
 
-module.exports = avconv;
-
-var   spawn  = require('child_process').spawn
-    , Stream = require('stream');
+var spawn  = require('child_process').spawn,
+    Stream = require('stream');
 
 // Converts a avconv time format to milliseconds
 function toMilliSeconds(time) {
-    var     d  = time.split(/[:.]/)
-        ,   ms = 0;
+    var d  = time.split(/[:.]/),
+        ms = 0;
 
     if (d.length === 4) {
-        ms += parseInt(d[0]) * 3600 * 1000;
-        ms += parseInt(d[1]) * 60 * 1000;
-        ms += parseInt(d[2]) * 1000;
-        ms += parseInt(d[3]);
+        ms += parseInt(d[0], 10) * 3600 * 1000;
+        ms += parseInt(d[1], 10) * 60 * 1000;
+        ms += parseInt(d[2], 10) * 1000;
+        ms += parseInt(d[3], 10);
     } else {
-        ms += parseInt(d[0]) * 1000;
-        ms += parseInt(d[1]);
+        ms += parseInt(d[0], 10) * 1000;
+        ms += parseInt(d[1], 10);
     }
 
     return ms;
@@ -25,15 +23,15 @@ function toMilliSeconds(time) {
 
 // Extract duration from avconv data
 function findDuration(data) {
-    var     result = /duration: (\d+:\d+:\d+.\d+)/i.exec(data)
-        ,   duration;
+    var result = /duration: (\d+:\d+:\d+.\d+)/i.exec(data),
+        duration;
 
     if (result && result[1]) {
         duration = toMilliSeconds(result[1]);
     }
 
     return duration;
-};
+}
 
 // Extract time frame from avconv data
 function findTime(data) {
@@ -48,12 +46,12 @@ function findTime(data) {
     }
 
     return time;
-};
+}
 
-function avconv(params) {
+module.exports = function avconv(params) {
 
-    var   stream = new Stream()
-        , avconv = spawn('avconv', params);
+    var stream = new Stream(),
+        avconv = spawn('avconv', params);
 
     stream.readable = true;
 
@@ -62,9 +60,9 @@ function avconv(params) {
 
         avconv.stderr.setEncoding('utf8');
 
-        var     duration
-            ,   time
-            ,   progress;
+        var duration,
+            time,
+            progress;
 
         avconv.stderr.on('data', function(data) {
 
@@ -106,9 +104,13 @@ function avconv(params) {
     // New stdio api introduced the exit event not waiting for open pipes
     var eventType = avconv.stdio ? 'close' : 'exit';
 
-    avconv.on(eventType, function(exitCode) {
-        stream.emit('end', exitCode);
+    avconv.on(eventType, function(exitCode, signal) {
+        stream.emit('end', exitCode, signal);
     });
 
+    stream.kill = function() {
+        avconv.kill();
+    };
+
     return stream;
-}
+};

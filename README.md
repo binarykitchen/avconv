@@ -68,7 +68,7 @@ stream.on('error', function(data) {
     process.stderr.write(data);
 });
 
-stream.once('end', function(exitCode) {
+stream.once('end', function(exitCode, signal) {
     // here you knows the avconv process is finished
     ...
 });
@@ -96,7 +96,8 @@ __return value__
     * `.on('data', function(data) {...})` - a chunk of data with useful information, depending on the log level. Any warnings or errors from avconv are there too.
     * `.on('progress', function(progress) {...})` - a floating number, 0 means conversion progress is at 0%, 1 is 100% and means, it's done. Very useful if you want to show the conversion progress on an user interface,
     * `.on('error', function(data) {...})` - rarely used. Would contain issues related to the OS itself.
-    * `.once('end', function(exitCode) {...})` - any integer where 0 means OK. Anything above 0 indicates a problem (exit code).
+    * `.once('end', function(exitCode, signal) {...})` - for the exit code any integer where 0 means OK. Anything above 0 indicates a problem (exit code). The signal tells how the process ended, i.E. can be a SIGTERM you killed it with `stream.kill()`. If it's null, then it ended normally.
+    * `.kill()` - call that if you want to abort avconv in the middle. It will kill the process and fire an `end` event for the stream.
 
 ## License
 

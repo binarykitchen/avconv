@@ -1,13 +1,13 @@
 "use strict";
 
-var   testCase  = require('nodeunit').testCase
-    , path      = require('path')
-    , fs        = require('fs')
-    , avconv;
+var testCase  = require('nodeunit').testCase,
+    path      = require('path'),
+    fs        = require('fs'),
+    avconv;
 
 function read(stream, callback) {
-    var   output = []
-        , err = [];
+    var output = [],
+        err = [];
 
     stream.on('data', function(data) {
         output.push(data);
@@ -17,8 +17,8 @@ function read(stream, callback) {
         err.push(data);
     });
 
-    stream.once('end', function(exitCode) {
-        callback(exitCode, output, err);
+    stream.once('end', function(exitCode, signal) {
+        callback(exitCode, signal, output, err);
     });
 }
 
@@ -35,14 +35,15 @@ module.exports = testCase({
         },
 
         'run without parameters (null) 1': function(t) {
-            t.expect(3);
+            t.expect(4);
 
             var stream = avconv(null);
 
-            read(stream, function(exitCode, output, err) {
+            read(stream, function(exitCode, signal, output, err) {
                 t.strictEqual(exitCode,   1,  'avconv did nothing');
                 t.notEqual(output.length, 0,  'output is not empty');
                 t.strictEqual(err.length, 0,  'err is empty');
+                t.strictEqual(signal, null,   'Signal is null');
 
                 t.done();
             });
@@ -53,7 +54,7 @@ module.exports = testCase({
 
             var stream = avconv([]);
 
-            read(stream, function(exitCode, output, err) {
+            read(stream, function(exitCode, signal, output, err) {
                 t.strictEqual(exitCode,   1, 'avconv did nothing');
                 t.notEqual(output.length, 0, 'output is not empty');
                 t.strictEqual(err.length, 0, 'err is empty');
@@ -81,7 +82,7 @@ module.exports = testCase({
 
             var stream = avconv(['fdsfdsfsdf']);
 
-            read(stream, function(exitCode, output, err) {
+            read(stream, function(exitCode, signal, output, err) {
 
                 t.strictEqual(exitCode,   1, 'avconv did nothing');
                 t.notEqual(output.length, 0, 'stdout is not empty and contains a warning about the wrong parameter');
@@ -97,7 +98,7 @@ module.exports = testCase({
 
             var stream = avconv(['--help']);
 
-            read(stream, function(exitCode, output, err) {
+            read(stream, function(exitCode, signal, output, err) {
 
                 t.strictEqual(exitCode,   0, 'avconv returned help');
                 t.notEqual(output.length, 0, 'stdout contains help');
@@ -127,15 +128,15 @@ module.exports = testCase({
         'convert pokemon flv to webm': function(t) {
 
             var params = [
-                    '-i',           path.join(this.exampleDir, 'pokemon_card.flv')
-                ,   '-c:v',         'libvpx'
-                ,   '-deadline',    'realtime'
-                ,   '-y',           path.join(this.exampleDir, 'pokemon_card.webm')
+                '-i',           path.join(this.exampleDir, 'pokemon_card.flv'),
+                '-c:v',         'libvpx',
+                '-deadline',    'realtime',
+                '-y',           path.join(this.exampleDir, 'pokemon_card.webm')
             ];
 
-            var     errors = ''
-                ,   datas   = ''
-                ,   previousProgress = 0;
+            var errors = '',
+                datas  = '',
+                previousProgress = 0;
 
             var stream = avconv(params);
 
@@ -154,15 +155,47 @@ module.exports = testCase({
                 errors += data;
             });
 
-            stream.once('end', function(exitCode) {
+            stream.once('end', function(exitCode, signal) {
 
                 t.strictEqual(exitCode, 0,    'Video has been successfully generated');
                 t.strictEqual(errors,   '',   'No errors occured at all');
+                t.strictEqual(signal, null,   'Signal is null');
 
                 t.ok(datas.length > 0, 'There is data');
 
                 t.done();
             });
+        },
+
+        'convert and kill in the middle': function(t) {
+
+            var params = [
+                '-i',           path.join(this.exampleDir, 'pokemon_card.flv'),
+                '-c:v',         'libvpx',
+                '-deadline',    'realtime',
+                '-y',           path.join(this.exampleDir, 'pokemon_card.webm')
+            ];
+
+            var errors = '';
+
+            var stream = avconv(params);
+
+            stream.on('error', function(data) {
+                errors += data;
+            });
+
+            stream.once('end', function(exitCode, signal) {
+
+                t.strictEqual(exitCode, null,       'There is no exit code when killed');
+                t.strictEqual(errors,   '',         'No errors occured at all');
+                t.strictEqual(signal,   'SIGTERM',  'Signal is SIGTERM');
+
+                t.done();
+            });
+
+            setTimeout(function() {
+                stream.kill();
+            }, 10);
         }
     })
 });
