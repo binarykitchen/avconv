@@ -6,6 +6,11 @@ Simply spawns an avconv process with any parameters and *streams* the result + c
 
 It also keeps you informed about the progress by emitting events. That's a very unique function of this module. Link that with an UI and it will look flash.
 
+## Support
+If you've found avconv useful and would like to contribute to its continued development & support, please feel free to send a donation of any size - it would be greatly appreciated!
+
+[![Support via Gittip](https://rawgithub.com/chris---/Donation-Badges/master/gittip.jpeg)](https://www.gittip.com/binarykitchen)
+
 ## Installation
 
 To install avconv, use [npm](http://github.com/isaacs/npm):
