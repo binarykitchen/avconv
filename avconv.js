@@ -48,6 +48,26 @@ function findTime(data) {
     return time;
 }
 
+function findVideoMetaData(data) {
+    var result = /Stream #(\S+): Video: (\S+), (\S+), (\d+)x(\d+)/.exec(data),
+        meta;
+
+    if (result && result[1]) {
+
+        meta = {
+            video: {
+                track:     result[1],
+                codec:     result[2],
+                format:    result[3],
+                width:     parseInt(result[4]),
+                height:    parseInt(result[5])
+            }
+        };
+    }
+
+    return meta;
+}
+
 module.exports = function avconv(params) {
 
     var stream = new Stream(),
@@ -62,7 +82,8 @@ module.exports = function avconv(params) {
 
         var duration,
             time,
-            progress;
+            progress,
+            meta;
 
         avconv.stderr.on('data', function(data) {
 
@@ -83,6 +104,15 @@ module.exports = function avconv(params) {
 
                 // Tell the world that progress is made
                 stream.emit('progress', progress);
+            }
+
+            if (!meta) {
+                meta = findVideoMetaData(data);
+
+                if (meta) {
+                    // Share the meta data we found
+                    stream.emit('meta', meta);
+                }
             }
 
             stream.emit('data', data);
