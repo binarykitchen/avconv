@@ -152,11 +152,11 @@ module.exports = testCase({
             });
 
             stream.on('meta', function(meta) {
-                t.strictEqual(meta.video.track,  '0.0',       'Video track number is correct');
-                t.strictEqual(meta.video.codec,  'libvpx',    'Video codec is correct');
-                t.strictEqual(meta.video.format, 'yuv420p',   'Video format is correct');
-                t.strictEqual(meta.video.width,  320,         'Video width is correct');
-                t.strictEqual(meta.video.height, 240,         'Video height is correct');
+                t.strictEqual(meta.video.track,  '0.0',         'Video track number is correct');
+                t.strictEqual(meta.video.codec,  'h264 (Main)', 'Video codec is correct');
+                t.strictEqual(meta.video.format, 'yuv420p',     'Video format is correct');
+                t.strictEqual(meta.video.width,  320,           'Video width is correct');
+                t.strictEqual(meta.video.height, 240,           'Video height is correct');
             });
 
             stream.on('error', function(data) {

@@ -49,7 +49,7 @@ function findTime(data) {
 }
 
 function findVideoMetaData(data) {
-    var result = /Stream #(\S+): Video: (\S+), (\S+), (\d+)x(\d+)/.exec(data),
+    var result = /Stream #([^:]+): Video: ([^,]+), ([^,]+), (\d+)x(\d+)/.exec(data),
         meta;
 
     if (result && result[1]) {
