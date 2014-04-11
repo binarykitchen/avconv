@@ -80,7 +80,8 @@ module.exports = function avconv(params) {
 
         avconv.stderr.setEncoding('utf8');
 
-        var duration,
+        var output = '',
+            duration,
             time,
             progress,
             meta;
@@ -89,8 +90,12 @@ module.exports = function avconv(params) {
 
             time = null;
 
+            // Keep the output so that we can parse stuff anytime,
+            // i.E. duration or meta data
+            output += data;
+
             if (!duration) {
-                duration = findDuration(data);
+                duration = findDuration(output);
             } else {
                 time = findTime(data);
             }
@@ -107,7 +112,7 @@ module.exports = function avconv(params) {
             }
 
             if (!meta) {
-                meta = findVideoMetaData(data);
+                meta = findVideoMetaData(output);
 
                 if (meta) {
                     // Share the meta data we found
