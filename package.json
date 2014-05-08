@@ -1,6 +1,6 @@
 {
     "name": "avconv",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "Simply spawns an avconv process with any parameters and *streams* the result + conversion progress to you. Very small, fast, clean and does only this.",
     "main": "avconv.js",
     "author": "Michael Heuberger <michael.heuberger@binarykitchen.com>",
@@ -10,7 +10,7 @@
         "video encoding"
     ],
     "devDependencies": {
-        "nodeunit": "^0.8.6"
+        "nodeunit": "^0.8.8"
     },
     "dependencies": {
     },

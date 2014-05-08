@@ -3,7 +3,6 @@
 var spawn  = require('child_process').spawn,
     Stream = require('stream');
 
-// Converts a avconv time format to milliseconds
 function toMilliSeconds(time) {
     var d  = time.split(/[:.]/),
         ms = 0;
@@ -21,7 +20,6 @@ function toMilliSeconds(time) {
     return ms;
 }
 
-// Extract duration from avconv data
 function findDuration(data) {
     var result = /duration: (\d+:\d+:\d+.\d+)/i.exec(data),
         duration;
@@ -33,7 +31,6 @@ function findDuration(data) {
     return duration;
 }
 
-// Extract time frame from avconv data
 function findTime(data) {
     var time;
 
@@ -53,7 +50,6 @@ function findVideoMetaData(data) {
         meta;
 
     if (result && result[1]) {
-
         meta = {
             video: {
                 track:     result[1],
@@ -71,6 +67,10 @@ function findVideoMetaData(data) {
 module.exports = function avconv(params) {
 
     var stream = new Stream(),
+        // todo: use a queue to deal with the spawn EMFILE exception
+        // see http://www.runtime-era.com/2012/10/quick-and-dirty-nodejs-exec-limit-queue.html
+        // currently I have added a dirty workaround on the server by increasing
+        // the file max descriptor with 'sudo sysctl -w fs.file-max=100000'
         avconv = spawn('avconv', params);
 
     stream.readable = true;
