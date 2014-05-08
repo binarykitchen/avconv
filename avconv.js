@@ -1,7 +1,8 @@
 "use strict";
 
-var spawn  = require('child_process').spawn,
-    Stream = require('stream');
+var spawn    = require('child_process').spawn,
+    AvStream = require('./avstream'),
+    util     = require('util');
 
 function toMilliSeconds(time) {
     var d  = time.split(/[:.]/),
@@ -66,14 +67,12 @@ function findVideoMetaData(data) {
 
 module.exports = function avconv(params) {
 
-    var stream = new Stream(),
+    var stream = new AvStream(),
         // todo: use a queue to deal with the spawn EMFILE exception
         // see http://www.runtime-era.com/2012/10/quick-and-dirty-nodejs-exec-limit-queue.html
         // currently I have added a dirty workaround on the server by increasing
         // the file max descriptor with 'sudo sysctl -w fs.file-max=100000'
         avconv = spawn('avconv', params);
-
-    stream.readable = true;
 
     // General avconv output is always written into stderr
     if (avconv.stderr) {
@@ -120,15 +119,34 @@ module.exports = function avconv(params) {
                 }
             }
 
-            stream.emit('data', data);
+            // Emit conversion information as messages
+            stream.emit('message', data);
         });
     }
 
-    // Just in case if there is something interesting
+    // When avconv outputs anything to stdout, it's probably converted data
     if (avconv.stdout) {
-        avconv.stdout.setEncoding('utf8');
         avconv.stdout.on('data', function(data) {
-            stream.emit('data', data);
+            stream.push(data)
+        });
+    }
+
+    // Pipe the stream to avconv standard input
+    if (avconv.stdin) {
+        
+        // Reduce overhead when receiving a pipe
+        stream.on('pipe', function(source) {
+
+            // Unpipe the source (input) stream from AvStream
+            source.unpipe(stream);
+
+            // And pipe it to avconv's stdin instead
+            source.pipe(avconv.stdin);
+        });
+
+        // When data is written to AvStream, send it to avconv's stdin
+        stream.on('inputData', function(data) {
+            avconv.stdin.write(data);
         });
     }
 
@@ -140,7 +158,8 @@ module.exports = function avconv(params) {
     var eventType = avconv.stdio ? 'close' : 'exit';
 
     avconv.on(eventType, function(exitCode, signal) {
-        stream.emit('end', exitCode, signal);
+        stream.end();
+        stream.emit('exit', exitCode, signal);
     });
 
     stream.kill = function() {
