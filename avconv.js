@@ -1,8 +1,9 @@
 "use strict";
 
 var spawn    = require('child_process').spawn,
-    AvStream = require('./avstream'),
-    util     = require('util');
+    util     = require('util'),
+
+    AvStream = require('./lib/avstream');
 
 function toMilliSeconds(time) {
     var d  = time.split(/[:.]/),
@@ -133,7 +134,7 @@ module.exports = function avconv(params) {
 
     // Pipe the stream to avconv standard input
     if (avconv.stdin) {
-        
+
         // Reduce overhead when receiving a pipe
         stream.on('pipe', function(source) {
 

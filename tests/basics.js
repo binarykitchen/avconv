@@ -29,8 +29,8 @@ module.exports = testCase({
         'loading avconv function (require)': function(t) {
             t.expect(1);
 
-            avconv = require('../avconv.js');
-            AvStream = require('../avstream.js');
+            avconv   = require('../avconv.js');
+            AvStream = require('../lib/avstream.js');
 
             t.ok(avconv, 'avconv is loaded.');
             t.done();
