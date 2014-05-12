@@ -3,13 +3,14 @@
 var testCase  = require('nodeunit').testCase,
     path      = require('path'),
     fs        = require('fs'),
-    avconv;
+    avconv,
+    AvStream;
 
 function read(stream, callback) {
     var output = [],
         err = [];
 
-    stream.on('data', function(data) {
+    stream.on('message', function(data) {
         output.push(data);
     });
 
@@ -17,7 +18,7 @@ function read(stream, callback) {
         err.push(data);
     });
 
-    stream.once('end', function(exitCode, signal) {
+    stream.once('exit', function(exitCode, signal) {
         callback(exitCode, signal, output, err);
     });
 }
@@ -29,6 +30,7 @@ module.exports = testCase({
             t.expect(1);
 
             avconv = require('../avconv.js');
+            AvStream = require('../avstream.js');
 
             t.ok(avconv, 'avconv is loaded.');
             t.done();
@@ -113,6 +115,25 @@ module.exports = testCase({
                 t.strictEqual(err.length, 0, 'stderr is still empty');
                 t.done();
             });
+        },
+
+        'test the AvStream class': function(t) {
+            t.expect(1);
+
+            var stream = AvStream(),
+                bytes  = 0;
+
+            // See if all bytes are correctly emitted back as an 'inputData' event
+            stream.on('inputData', function(d) {
+                bytes += d.length;
+            });
+
+            stream.on('finish', function() {
+                t.strictEqual(bytes, 1085887, 'all bytes have been emitted back');
+                t.done();
+            });
+
+            fs.createReadStream(path.join(__dirname, 'example', 'pokemon_card.flv')).pipe(stream);
         }
     }),
 
@@ -148,7 +169,7 @@ module.exports = testCase({
 
             var stream = avconv(params);
 
-            stream.on('data', function(data) {
+            stream.on('message', function(data) {
                 datas += data;
             });
 
@@ -171,7 +192,7 @@ module.exports = testCase({
                 errors += data;
             });
 
-            stream.once('end', function(exitCode, signal) {
+            stream.once('exit', function(exitCode, signal) {
 
                 t.strictEqual(exitCode, 0,    'Video has been successfully generated');
                 t.strictEqual(errors,   '',   'No errors occured at all');
@@ -200,7 +221,7 @@ module.exports = testCase({
                 errors += data;
             });
 
-            stream.once('end', function(exitCode, signal) {
+            stream.once('exit', function(exitCode, signal) {
 
                 t.strictEqual(exitCode, null,       'There is no exit code when killed');
                 t.strictEqual(errors,   '',         'No errors occured at all');
@@ -212,6 +233,42 @@ module.exports = testCase({
             setTimeout(function() {
                 stream.kill();
             }, 10);
+        },
+
+        'stream input and output': function(t) {
+
+            var params = [
+                '-i',           'pipe:0',
+                '-c:v',         'libvpx',
+                '-f',           'webm',
+                '-deadline',    'realtime',
+                'pipe:1'
+            ];
+
+            var stream = avconv(params);
+            var errors = '';
+            var bytes = 0;
+
+            fs.createReadStream(path.join(this.exampleDir, 'pokemon_card.flv')).pipe(stream);
+
+            stream.on('data', function(data) {
+                bytes += data.length;
+            });
+
+            stream.on('error', function(data) {
+                errors += data;
+            });
+
+            stream.once('exit', function(exitCode, signal) {
+
+                t.strictEqual(exitCode, 0,    'avconv has exited without errors');
+                t.strictEqual(errors,   '',   'No errors occured at all');
+                t.strictEqual(signal, null,   'Signal is null');
+
+                t.ok(bytes > 0, 'The conversion has succeeded');
+
+                t.done();
+            });
         }
     })
 });
