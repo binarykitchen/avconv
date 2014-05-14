@@ -163,14 +163,18 @@ __one argument__
 __one return value__
 
 * stream - a readable stream where you can attach well-known events like:
-    * `.on('data', function(data) {...})` - a buffer object with converted data (if outputting to pipe:1)
     * `.on('message', function(data) {...})` - a chunk of data with useful information, depending on the log level. Any warnings or errors from avconv are there too.
     * `.on('progress', function(progress) {...})` - a floating number, 0 means conversion progress is at 0%, 1 is 100% and means, it's done. Very useful if you want to show the conversion progress on an user interface.
     * `.on('meta', function(meta) {...})` - returns video meta data in json.
+    * `.on('data', function(data) {...})` - a buffer object with converted data (if outputting to pipe:1)
     * `.on('error', function(data) {...})` - rarely used. Would contain issues related to the OS itself.
     * `.once('exit', function(exitCode, signal) {...})` - for the exit code any integer where 0 means OK. Anything above 0 indicates a problem (exit code). The signal tells how the process ended, i.E. can be a SIGTERM you killed it with `stream.kill()`. If it's null, then it ended normally.
 
 And of course, you can `.kill()` the stream, if you want to abort in the middle. It will kill the process in cold blood and delegate an `exit` event to avconv's internals.
+
+## Changelog
+
+See History.md
 
 ## Contributors
 
