@@ -48,8 +48,8 @@ function findTime(data) {
 }
 
 var
-    VIDEO_META = {CODEC: 0, FORMAT: 1, RESOLUTION: 2, BITRATE:3, FPS: 4},
-    AUDIO_META = {CODEC: 0, SAMPLERATE: 1, SPATIALIZATION: 2, ENCODING: 3, BITRATE: 4}
+    VIDEO_META = {CODEC: 0, FORMAT: 1, RESOLUTION: 2, BITRATE: 3, FPS: 4},
+    AUDIO_META = {CODEC: 0, SAMPLERATE: 1, SPATIALIZATION: 2, SAMPLEFORMAT: 3, BITRATE: 4}
 ;
 function parseMetaData(output) {
     var
@@ -57,14 +57,15 @@ function parseMetaData(output) {
         streamIndex,
         streamData,
         metaType,
-        ioData, tmp;
+        metaData,
+        tmp;
 
-    function mapInts(v) {return parseInt(v,10)}
+    function getInteger(v) {return parseInt(v,10)}
     function getChannelCount(v){
         if (v == "mono") return 1;
         if (v == "stereo") return 2;
         if (v.indexOf('.') != -1) {
-            return v.split('.').map(mapInts)
+            return v.split('.').map(getInteger)
                     .reduce(function(a,b){return a+b});
         }
         return v;
@@ -80,29 +81,29 @@ function parseMetaData(output) {
             metaType = null;
 
         if (!metaType) return;
-        ioData = meta[metaType];
+        metaData = meta[metaType];
 
         // is io meta data
         if (/^\s*Duration/.test(dataLine)) {
             dataLine
                 .split(',')
                 .map(function(d){return d.split(/:\s/)})
-                .forEach(function(kv){ioData[kv[0].toLowerCase().trim()]=kv[1]});
-            if (ioData.duration)
-                ioData.duration = toMilliSeconds(ioData.duration);
-            if (ioData.bitrate)
-                ioData.bitrate = parseInt(ioData.bitrate, 10);
-            if (ioData.start)
-                ioData.start = parseFloat(ioData.start);
+                .forEach(function(kv){metaData[kv[0].toLowerCase().trim()]=kv[1]});
+            if (metaData.duration)
+                metaData.duration = toMilliSeconds(metaData.duration);
+            if (metaData.bitrate)
+                metaData.bitrate = getInteger(metaData.bitrate);
+            if (metaData.start)
+                metaData.start = parseFloat(metaData.start);
         } else if (/^\s*Stream #/.test(dataLine)) { // is stream meta data
             // resolve stream indices
             tmp = dataLine.match(/#(\d+)\.(\d+)/);
             if (!tmp) return;
-            streamIndex = tmp.slice(1).map(mapInts);
+            streamIndex = tmp.slice(1).map(getInteger);
 
             // get or create stream structure
-            if (!ioData.stream) ioData.stream = [];
-            streamData = ioData.stream[streamIndex[0]] || (ioData.stream[streamIndex[0]] = []);
+            if (!metaData.stream) metaData.stream = [];
+            streamData = metaData.stream[streamIndex[0]] || (metaData.stream[streamIndex[0]] = []);
             streamData = streamData[streamIndex[1]] || (streamData[streamIndex[1]] = {});
 
             // get stream type
@@ -120,18 +121,16 @@ function parseMetaData(output) {
             if (streamData.type == "video") {
                 streamData.codec = tmp[VIDEO_META.CODEC];
                 streamData.format = tmp[VIDEO_META.FORMAT];
-                streamData.resolution = tmp[VIDEO_META.RESOLUTION].split("x").map(mapInts);
-                streamData.bitrate = parseInt(tmp[
-                    metaType == "output"? VIDEO_META.FPS : VIDEO_META.BITRATE
-                ], 10);
+                streamData.resolution = tmp[VIDEO_META.RESOLUTION].split("x").map(getInteger);
+                streamData.bitrate = getInteger(tmp[VIDEO_META.BITRATE+(metaType=="output"?1:0)]);
                 if (metaType == "input")
                     streamData.fps = parseFloat(tmp[VIDEO_META.FPS]);
             } else if (streamData.type == "audio") {
                 streamData.codec = tmp[AUDIO_META.CODEC];
-                streamData.samplerate = parseInt(tmp[AUDIO_META.SAMPLERATE], 10);
+                streamData.samplerate = getInteger(tmp[AUDIO_META.SAMPLERATE]);
                 streamData.channels = getChannelCount(tmp[AUDIO_META.SPATIALIZATION]);
-                streamData.encoding = tmp[AUDIO_META.ENCODING];
-                streamData.bitrate = parseInt(tmp[AUDIO_META.BITRATE], 10);
+                streamData.sampleformat = tmp[AUDIO_META.SAMPLEFORMAT];
+                streamData.bitrate = getInteger(tmp[AUDIO_META.BITRATE]);
             }
         }
     });
