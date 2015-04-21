@@ -1,6 +1,6 @@
 {
     "name": "avconv",
-    "version": "2.0.0",
+    "version": "3.0.0",
     "description": "Simply spawns an avconv process with any parameters and *streams* the result + conversion progress to you. Very small, fast, clean and does only this.",
     "main": "avconv.js",
     "author": "Michael Heuberger <michael.heuberger@binarykitchen.com>",
@@ -12,6 +12,10 @@
         {
             "name": "Jelle De Loecker",
             "email": "jelle@kipdola.be"
+        },
+        {
+            "name": "Jan Scheurer",
+            "email": "lj1102@googlemail.com"
         }
     ],
     "keywords": [

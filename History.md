@@ -1,3 +1,10 @@
+3.0.0 / 2015-04-22
+==================
+
+ * Rebuild meta data parsing (breaking):
+   - the `meta` event has been removed, metadata is now provided as third argument to the `exit` listener
+   - metadata format changed to a more generic per stream structure, [see readme](https://github.com/binarykitchen/avconv#metadata-object).
+
 2.0.0 / 2014-05-14
 ==================
 

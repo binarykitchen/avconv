@@ -105,24 +105,6 @@ stream.on('progress', function(progress) {
     */
 });
 
-stream.on('meta', function(meta) {
-    /*
-    Meta is a json. Here is an example:
-
-        meta = {
-            video: {
-                track:  '0.0',
-                codec:  'libvpx',
-                format: 'yuv420p',
-                width:  320,
-                height: 240
-            }
-        };
-
-    Currently it returns meta data about the first video track only. If you want more, drop an issue.
-    */
-});
-
 stream.on('error', function(data) {
     process.stderr.write(data);
 });
@@ -137,9 +119,10 @@ stream.on('data', function(data) {
 // You can also pipe the output
 stream.pipe(fs.createWriteStream('video.mp4'));
 
-stream.once('exit', function(exitCode, signal) {
+stream.once('exit', function(exitCode, signal, metadata) {
     /*
-    Here you knows the avconv process is finished
+    Here you know the avconv process is finished
+    Metadata contains parsed avconv output as described in the next section
     */
 });
 ```
@@ -165,12 +148,65 @@ __one return value__
 * stream - a readable stream where you can attach well-known events like:
     * `.on('message', function(data) {...})` - a chunk of data with useful information, depending on the log level. Any warnings or errors from avconv are there too.
     * `.on('progress', function(progress) {...})` - a floating number, 0 means conversion progress is at 0%, 1 is 100% and means, it's done. Very useful if you want to show the conversion progress on an user interface.
-    * `.on('meta', function(meta) {...})` - returns video meta data in json.
     * `.on('data', function(data) {...})` - a buffer object with converted data (if outputting to pipe:1)
     * `.on('error', function(data) {...})` - rarely used. Would contain issues related to the OS itself.
-    * `.once('exit', function(exitCode, signal) {...})` - for the exit code any integer where 0 means OK. Anything above 0 indicates a problem (exit code). The signal tells how the process ended, i.E. can be a SIGTERM you killed it with `stream.kill()`. If it's null, then it ended normally.
+    * `.once('exit', function(exitCode, signal, metadata) {...})` - for the exit code any integer where 0 means OK. Anything above 0 indicates a problem (exit code). The signal tells how the process ended, i.E. can be a SIGTERM you killed it with `stream.kill()`. If it's null, then it ended normally.
 
 And of course, you can `.kill()` the stream, if you want to abort in the middle. It will kill the process in cold blood and delegate an `exit` event to avconv's internals.
+
+### Metadata object
+Most of the output of avconv is parsed into a metadata object accessable in the `exit` event.
+
+__Please note that parsing of some stream properties may fail, resulting in `null` or `NaN` values.__
+```javascript
+// converting an flv file to webm
+{
+    input: {
+        duration: 32056, // milliseconds
+        start: 0,
+        bitrate: null,
+        stream: [
+            [
+                {
+                    type: "video",
+                    codec: "h264",
+                    format: "yuv420p",
+                    resolution: [ 320, 240 ],
+                    bitrate: 202, // kb/s
+                    fps: 29.92
+                },{
+                    type: "audio",
+                    codec: "aac",
+                    samplerate: 22050, // Hz
+                    channels: 2, // will be 6 for 5.1 etc.
+                    sampleformat: "fltp",
+                    bitrate: 63 // kbs
+                }
+            ]
+        ]
+    },
+    output: {
+        stream: [
+            [
+                {
+                    type: "video",
+                    codec: "libvpx",
+                    format: "yuv420p",
+                    resolution: [ 320, 240 ],
+                    bitrate: 200
+                },{
+                    type: "audio",
+                    codec: "libvorbis",
+                    samplerate: 22050,
+                    channels: 2,
+                    sampleformat: "fltp",
+                    bitrate: null
+                }
+            ]
+        ]
+    }
+}
+``` 
 
 ## Changelog
 
@@ -180,6 +216,7 @@ See History.md
 
 * Michael Heuberger <michael.heuberger@binarykitchen.com>
 * Jelle De Loecker <jelle@kipdola.be>
+* Jan Scheurer <lj1102@googlemail.com>
 * You?
 
 ## License
