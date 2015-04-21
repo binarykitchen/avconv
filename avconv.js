@@ -47,27 +47,98 @@ function findTime(data) {
     return time;
 }
 
-function findVideoMetaData(data) {
-    var result = /Stream #([^:]+): Video: ([^,]+), ([^,]+), (\d+)x(\d+)/.exec(data),
-        meta;
+var
+    VIDEO_META = {CODEC: 0, FORMAT: 1, RESOLUTION: 2, BITRATE:3, FPS: 4},
+    AUDIO_META = {CODEC: 0, SAMPLERATE: 1, SPATIALIZATION: 2, ENCODING: 3, BITRATE: 4}
+;
+function parseMetaData(output) {
+    var
+        meta = {input:{},output:{}},
+        streamIndex,
+        streamData,
+        metaType,
+        ioData, tmp;
 
-    if (result && result[1]) {
-        meta = {
-            video: {
-                track:     result[1],
-                codec:     result[2],
-                format:    result[3],
-                width:     parseInt(result[4]),
-                height:    parseInt(result[5])
-            }
-        };
+    function mapInts(v) {return parseInt(v,10)}
+    function getChannelCount(v){
+        if (v == "mono") return 1;
+        if (v == "stereo") return 2;
+        if (v.indexOf('.') != -1) {
+            return v.split('.').map(mapInts)
+                    .reduce(function(a,b){return a+b});
+        }
+        return v;
     }
+    // process lines
+    output.split("\n").forEach(function (dataLine) {
+        // get metadata type
+        if (/^Input/i.test(dataLine))
+            metaType = "input";
+        else if (/^Output/i.test(dataLine))
+            metaType = "output";
+        else if (/^Stream mapping/i.test(dataLine))
+            metaType = null;
 
+        if (!metaType) return;
+        ioData = meta[metaType];
+
+        // is io meta data
+        if (/^\s*Duration/.test(dataLine)) {
+            dataLine
+                .split(',')
+                .map(function(d){return d.split(/:\s/)})
+                .forEach(function(kv){ioData[kv[0].toLowerCase().trim()]=kv[1]});
+            if (ioData.duration)
+                ioData.duration = toMilliSeconds(ioData.duration);
+            if (ioData.bitrate)
+                ioData.bitrate = parseInt(ioData.bitrate, 10);
+            if (ioData.start)
+                ioData.start = parseFloat(ioData.start);
+        } else if (/^\s*Stream #/.test(dataLine)) { // is stream meta data
+            // resolve stream indices
+            tmp = dataLine.match(/#(\d+)\.(\d+)/);
+            if (!tmp) return;
+            streamIndex = tmp.slice(1).map(mapInts);
+
+            // get or create stream structure
+            if (!ioData.stream) ioData.stream = [];
+            streamData = ioData.stream[streamIndex[0]] || (ioData.stream[streamIndex[0]] = []);
+            streamData = streamData[streamIndex[1]] || (streamData[streamIndex[1]] = {});
+
+            // get stream type
+            tmp = dataLine.match(/video|audio/i);
+            if (!tmp) return;
+            streamData.type = tmp[0].toLowerCase();
+
+            // prepare stream data
+            tmp = dataLine.replace(/.*?(Video|Audio):/i, '').split(", ").map(function(v){
+                return v.replace(/[\[\(][^\]\)]*[\]\)]?/, '')
+                        .trim().replace(/ [\w\/]+$/, '').trim();
+            });
+
+            // parse stream data
+            if (streamData.type == "video") {
+                streamData.codec = tmp[VIDEO_META.CODEC];
+                streamData.format = tmp[VIDEO_META.FORMAT];
+                streamData.resolution = tmp[VIDEO_META.RESOLUTION].split("x").map(mapInts);
+                streamData.bitrate = parseInt(tmp[
+                    metaType == "output"? VIDEO_META.FPS : VIDEO_META.BITRATE
+                ], 10);
+                if (metaType == "input")
+                    streamData.fps = parseFloat(tmp[VIDEO_META.FPS]);
+            } else if (streamData.type == "audio") {
+                streamData.codec = tmp[AUDIO_META.CODEC];
+                streamData.samplerate = parseInt(tmp[AUDIO_META.SAMPLERATE], 10);
+                streamData.channels = getChannelCount(tmp[AUDIO_META.SPATIALIZATION]);
+                streamData.encoding = tmp[AUDIO_META.ENCODING];
+                streamData.bitrate = parseInt(tmp[AUDIO_META.BITRATE], 10);
+            }
+        }
+    });
     return meta;
 }
 
 module.exports = function avconv(params) {
-
     var stream = new AvStream(),
         // todo: use a queue to deal with the spawn EMFILE exception
         // see http://www.runtime-era.com/2012/10/quick-and-dirty-nodejs-exec-limit-queue.html
@@ -83,8 +154,7 @@ module.exports = function avconv(params) {
         var output = '',
             duration,
             time,
-            progress,
-            meta;
+            progress;
 
         avconv.stderr.on('data', function(data) {
 
@@ -109,15 +179,6 @@ module.exports = function avconv(params) {
 
                 // Tell the world that progress is made
                 stream.emit('progress', progress);
-            }
-
-            if (!meta) {
-                meta = findVideoMetaData(output);
-
-                if (meta) {
-                    // Share the meta data we found
-                    stream.emit('meta', meta);
-                }
             }
 
             // Emit conversion information as messages
@@ -160,7 +221,7 @@ module.exports = function avconv(params) {
 
     avconv.on(eventType, function(exitCode, signal) {
         stream.end();
-        stream.emit('exit', exitCode, signal);
+        stream.emit('exit', exitCode, signal, parseMetaData(output));
     });
 
     stream.kill = function() {
