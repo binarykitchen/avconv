@@ -24,12 +24,12 @@
         "video encoding"
     ],
     "devDependencies": {
-        "nodeunit": "^0.9.0"
+        "nodeunit": "0.9.1"
     },
     "dependencies": {
     },
     "engines": {
-        "node": "~0.10.20"
+        "node": ">=0.10.20"
     },
     "scripts": {
         "test": "nodeunit tests/basics.js"

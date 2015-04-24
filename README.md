@@ -86,7 +86,7 @@ stream.pipe(fs.createWriteStream('audio.raw'));
 
 If you want to watch for errors or for exit codes from the avconv process then you should add event listeners like that:
 
-```
+```javascript
 var stream = avconv(params);
 
 stream.on('message', function(data) {
