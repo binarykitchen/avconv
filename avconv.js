@@ -13,7 +13,7 @@ function toMilliSeconds(time) {
         ms += parseInt(d[0], 10) * 3600 * 1000;
         ms += parseInt(d[1], 10) * 60 * 1000;
         ms += parseInt(d[2], 10) * 1000;
-        ms += parseInt(d[3], 10);
+        ms += parseInt(d[3], 10) * 10;
     } else {
         ms += parseInt(d[0], 10) * 1000;
         ms += parseInt(d[1], 10);
