@@ -36,10 +36,10 @@ module.exports = testCase({
             t.done();
         },
 
-        'run without parameters (null) 1': function(t) {
+        'run without parameters': function(t) {
             t.expect(4);
 
-            var stream = avconv(null);
+            var stream = avconv();
 
             read(stream, function(exitCode, signal, output, err) {
                 t.strictEqual(exitCode,   1,  'avconv did nothing');
@@ -65,11 +65,6 @@ module.exports = testCase({
             });
         },
 
-        // does not seem to work, see
-        // https://github.com/joyent/node/issues/7456
-
-        /*
-
         'run with invalid string parameter (fdsfdsfsdf)': function(t) {
 
             t.expect(1);
@@ -84,8 +79,6 @@ module.exports = testCase({
 
             t.done();
         },
-
-        */
 
         'run with invalid array parameters ([fdsfdsfsdf])': function(t) {
             t.expect(3);
@@ -155,7 +148,6 @@ module.exports = testCase({
         },
 
         'convert pokemon flv to webm': function(t) {
-
             var params = [
                 '-i',           path.join(this.exampleDir, 'pokemon_card.flv'),
                 '-c:v',         'libvpx',
