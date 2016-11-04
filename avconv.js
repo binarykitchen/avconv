@@ -137,13 +137,14 @@ function parseMetaData(output) {
     return meta;
 }
 
-module.exports = function avconv(params) {
+module.exports = function avconv(params, command) {
     var stream = new AvStream(),
+        command = command || 'avconv',
         // todo: use a queue to deal with the spawn EMFILE exception
         // see http://www.runtime-era.com/2012/10/quick-and-dirty-nodejs-exec-limit-queue.html
         // currently I have added a dirty workaround on the server by increasing
         // the file max descriptor with 'sudo sysctl -w fs.file-max=100000'
-        avconv = spawn('avconv', params);
+        avconv = spawn(command, params);
 
     // General avconv output is always written into stderr
     if (avconv.stderr) {
