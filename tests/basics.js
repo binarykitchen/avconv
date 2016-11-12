@@ -1,8 +1,9 @@
 "use strict";
 
-var testCase  = require('nodeunit').testCase,
-    path      = require('path'),
-    fs        = require('fs'),
+var testCase   = require('nodeunit').testCase,
+    path       = require('path'),
+    fs         = require('fs'),
+    ffmpegPath = require('ffmpeg-static').path,
     avconv,
     AvStream;
 
@@ -292,5 +293,20 @@ module.exports = testCase({
                 t.done();
             });
         }
-    })
+    }),
+    'TC 4: parametric avconv executable': testCase({
+        'loading help (--help) from custom avconv': function(t) {
+            t.expect(3);
+
+            var stream = avconv(['--help'], ffmpegPath);
+
+            read(stream, function(exitCode, signal, output, err) {
+
+                t.strictEqual(exitCode,   0, 'avconv returned help');
+                t.notEqual(output.length, 0, 'stdout contains help');
+                t.strictEqual(err.length, 0, 'stderr is still empty');
+                t.done();
+            });
+        }
+    }),
 });

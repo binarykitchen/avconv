@@ -24,6 +24,7 @@
         "video encoding"
     ],
     "devDependencies": {
+        "ffmpeg-static": "^2.0.0",
         "nodeunit": "0.9.1"
     },
     "dependencies": {

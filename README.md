@@ -135,13 +135,17 @@ Whereas errors from the stream are rarely filled (`error` event). They happen on
 
 ## API
 
-### stream = avconv(params)
+### stream = avconv(params, [command = 'avconv'])
 
 Avconv spawns a new avconv process with any given parameters. It does not validate the parameters nor mess with the results. That's all up to you. You would see avconv complaining about bad parameters in the `data` event anyway. So:
 
-__one argument__
+__one mandatory argument__
 
 * params - any array list with string arguments as values (see examples)
+
+__one optional argument__
+
+* command - the path to the avconv executable (for example to a static binary). Defaults to 'avconv'.
 
 __one return value__
 
