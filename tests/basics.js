@@ -1,5 +1,3 @@
-"use strict";
-
 var testCase   = require('nodeunit').testCase,
     path       = require('path'),
     fs         = require('fs'),
@@ -178,50 +176,12 @@ module.exports = testCase({
             });
 
             stream.once('exit', function(exitCode, signal, meta) {
-                var videoStreamMeta, audioStreamMeta;
-
                 t.strictEqual(exitCode, 0,    'Video has been successfully generated');
                 t.strictEqual(errors,   '',   'No errors occured at all');
                 t.strictEqual(signal, null,   'Signal is null');
 
                 t.ok(datas.length > 0, 'There is data');
-                // Input meta data
-                t.strictEqual(meta.input.stream.length, 1, 'Input file streams correctly detected')
-                t.strictEqual(meta.input.stream[0].length, 2, 'Input file substreams correctly detected');
-                videoStreamMeta = meta.input.stream[0][0];
-                audioStreamMeta = meta.input.stream[0][1];
-                t.strictEqual(videoStreamMeta.type, 'video', 'Input video stream correctly detected');
-                t.strictEqual(audioStreamMeta.type, 'audio', 'Input audio stream correctly detected');
-                // video
-                t.strictEqual(videoStreamMeta.codec,         'h264',    'Input video stream codec is correct');
-                t.strictEqual(videoStreamMeta.format,        'yuv420p', 'Input video stream format is correct');
-                t.strictEqual(videoStreamMeta.resolution[0], 320,       'Input video stream width is correct');
-                t.strictEqual(videoStreamMeta.resolution[1], 240,       'Input video stream height is correct');
-                t.strictEqual(videoStreamMeta.bitrate,       202,       'Input video stream bitrate is correct');
-                t.strictEqual(videoStreamMeta.fps,           29.92,     'Input video stream fps is correct');
-                // audio
-                t.strictEqual(audioStreamMeta.codec,         'aac',     'Input audio stream codec is correct');
-                t.strictEqual(audioStreamMeta.samplerate,    22050,     'Input audio stream samplerate is correct');
-                t.strictEqual(audioStreamMeta.channels,      2,         'Input audio stream channels are correct');
-                t.strictEqual(audioStreamMeta.bitrate,       63,        'Input audio stream bitrate is correct');
-
-                // Output meta data
-                t.strictEqual(meta.output.stream.length, 1, 'Output file streams correctly detected')
-                t.strictEqual(meta.output.stream[0].length, 2, 'Output file substreams correctly detected');
-                videoStreamMeta = meta.output.stream[0][0];
-                audioStreamMeta = meta.output.stream[0][1];
-                t.strictEqual(videoStreamMeta.type, 'video', 'Output video stream correctly detected');
-                t.strictEqual(audioStreamMeta.type, 'audio', 'Output audio stream correctly detected');
-                // video
-                t.strictEqual(videoStreamMeta.codec,         'libvpx',  'Output video stream codec is correct');
-                t.strictEqual(videoStreamMeta.format,        'yuv420p', 'Output video stream format is correct');
-                t.strictEqual(videoStreamMeta.resolution[0], 320,       'Output video stream width is correct');
-                t.strictEqual(videoStreamMeta.resolution[1], 240,       'Output video stream height is correct');
-                t.strictEqual(videoStreamMeta.bitrate,       200,       'Output video stream bitrate is correct');
-                // audio
-                t.strictEqual(audioStreamMeta.codec,         'libvorbis','Output audio stream codec is correct');
-                t.strictEqual(audioStreamMeta.samplerate,    22050,      'Output audio stream samplerate is correct');
-                t.strictEqual(audioStreamMeta.channels,      2,          'Output audio stream channels are correct');
+                t.ok(meta.input, 'There is meta input data');
 
                 t.done();
             });
