@@ -62,7 +62,7 @@ function parseMetaData(output) {
     function getChannelCount(v){
         if (v == "mono") return 1;
         if (v == "stereo") return 2;
-        if (v.indexOf('.') != -1) {
+        if (v && v.indexOf('.') != -1) {
             return v.split('.').map(getInteger)
                     .reduce(function(a,b){return a+b});
         }
