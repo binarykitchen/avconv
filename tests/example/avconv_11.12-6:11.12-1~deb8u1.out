@@ -1,0 +1,32 @@
+avconv version 11.12-6:11.12-1~deb8u1, Copyright (c) 2000-2018 the Libav developers
+  built on Feb 18 2018 20:26:27 with gcc 4.9.2 (Debian 4.9.2-10)
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'file_example_MP4_640_3MG.mp4':
+  Metadata:
+    major_brand     : mp42
+    minor_version   : 0
+    compatible_brands: mp42mp41isomavc1
+    creation_time   : 2015-08-07 09:13:05
+  Duration: 00:00:30.52, start: 0.000000, bitrate: 816 kb/s
+    Stream #0.0(und): Video: h264 (High), yuv420p, 640x360 [PAR 1:1 DAR 16:9], 710 kb/s, 30 fps, 30 tbn, 60 tbc (default)
+    Metadata:
+      creation_time   : 2015-08-07 09:13:05
+      encoder         : AVC Coding
+    Stream #0.1(und): Audio: aac, 48000 Hz, stereo, fltp, 112 kb/s (default)
+    Metadata:
+      creation_time   : 2015-08-07 09:13:05
+Output #0, image2, to 'test.jpg':
+  Metadata:
+    major_brand     : mp42
+    minor_version   : 0
+    compatible_brands: mp42mp41isomavc1
+    creation_time   : 2015-08-07 09:13:05
+    encoder         : Lavf56.1.0
+    Stream #0.0(und): Video: mjpeg, yuvj420p, 640x360 [PAR 1:1 DAR 16:9], q=2-31, 200 kb/s, 1 fps, 1 tbn, 1 tbc (default)
+    Metadata:
+      creation_time   : 2015-08-07 09:13:05
+      encoder         : AVC Coding
+Stream mapping:
+  Stream #0:0 -> #0:0 (h264 (native) -> mjpeg (native))
+Press ctrl-c to stop encoding
+frame=    1 fps=  0 q=3.8 Lsize=       0kB time=10000000000.00 bitrate=   0.0kbits/s
+video:11kB audio:0kB other streams:0kB global headers:0kB muxing overhead: unknown

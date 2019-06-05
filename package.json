@@ -33,7 +33,7 @@
         "node": ">=4.2.0"
     },
     "scripts": {
-        "test": "nodeunit tests/basics.js"
+        "test": "nodeunit tests/basics.js tests/parser.js"
     },
     "repository": {
         "type": "git",

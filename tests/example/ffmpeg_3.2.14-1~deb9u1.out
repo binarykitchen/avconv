@@ -1,0 +1,48 @@
+avconv -ss 00:00:1 -i file_example_MP4_640_3MG.mp4 -frames:v 1 -r 1 -f image2 test.jpg 2>&1                        
+ffmpeg version 3.2.14-1~deb9u1 Copyright (c) 2000-2019 the FFmpeg developers
+  built with gcc 6.3.0 (Debian 6.3.0-18+deb9u1) 20170516
+  configuration: --prefix=/usr --extra-version='1~deb9u1' --toolchain=hardened --libdir=/usr/lib/x86_64-linux-gnu --incdir=/usr/include/x86_64-linux-gnu --enable-gpl --disable-stripping --enable-avresample --enable-avisynth --enable-gnutls --enable-ladspa --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libcdio --enable-libebur128 --enable-libflite --enable-libfontconfig --enable-libfreetype --enable-libfribidi --enable-libgme --enable-libgsm --enable-libmp3lame --enable-libopenjpeg --enable-libopenmpt --enable-libopus --enable-libpulse --enable-librubberband --enable-libshine --enable-libsnappy --enable-libsoxr --enable-libspeex --enable-libssh --enable-libtheora --enable-libtwolame --enable-libvorbis --enable-libvpx --enable-libwavpack --enable-libwebp --enable-libx265 --enable-libxvid --enable-libzmq --enable-libzvbi --enable-omx --enable-openal --enable-opengl --enable-sdl2 --enable-libdc1394 --enable-libiec61883 --enable-chromaprint --enable-frei0r --enable-libopencv --enable-libx264 --enable-shared
+  libavutil      55. 34.101 / 55. 34.101
+  libavcodec     57. 64.101 / 57. 64.101
+  libavformat    57. 56.101 / 57. 56.101
+  libavdevice    57.  1.100 / 57.  1.100
+  libavfilter     6. 65.100 /  6. 65.100
+  libavresample   3.  1.  0 /  3.  1.  0
+  libswscale      4.  2.100 /  4.  2.100
+  libswresample   2.  3.100 /  2.  3.100
+  libpostproc    54.  1.100 / 54.  1.100
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'file_example_MP4_640_3MG.mp4':
+  Metadata:
+    major_brand     : mp42
+    minor_version   : 0
+    compatible_brands: mp42mp41isomavc1
+    creation_time   : 2015-08-07T09:13:05.000000Z
+  Duration: 00:00:30.53, start: 0.000000, bitrate: 816 kb/s
+    Stream #0:0(und): Video: h264 (High) (avc1 / 0x31637661), yuv420p, 640x360 [SAR 1:1 DAR 16:9], 710 kb/s, 30 fps, 30 tbr, 30 tbn, 60 tbc (default)
+    Metadata:
+      creation_time   : 2015-08-07T09:13:05.000000Z
+      handler_name    : L-SMASH Video Handler
+      encoder         : AVC Coding
+    Stream #0:1(und): Audio: aac (LC) (mp4a / 0x6134706D), 48000 Hz, stereo, fltp, 112 kb/s (default)
+    Metadata:
+      creation_time   : 2015-08-07T09:13:05.000000Z
+      handler_name    : L-SMASH Audio Handler
+[swscaler @ 0x557b538ca480] deprecated pixel format used, make sure you did set range correctly
+Output #0, image2, to 'test.jpg':
+  Metadata:
+    major_brand     : mp42
+    minor_version   : 0
+    compatible_brands: mp42mp41isomavc1
+    encoder         : Lavf57.56.101
+    Stream #0:0(und): Video: mjpeg, yuvj420p(pc), 640x360 [SAR 1:1 DAR 16:9], q=2-31, 200 kb/s, 1 fps, 1 tbn, 1 tbc (default)
+    Metadata:
+      creation_time   : 2015-08-07T09:13:05.000000Z
+      handler_name    : L-SMASH Video Handler
+      encoder         : Lavc57.64.101 mjpeg
+    Side data:
+      cpb: bitrate max/min/avg: 0/0/200000 buffer size: 0 vbv_delay: -1
+Stream mapping:
+  Stream #0:0 -> #0:0 (h264 (native) -> mjpeg (native))
+Press [q] to stop, [?] for help
+frame=    1 fps=0.0 q=3.8 Lsize=N/A time=00:00:01.00 bitrate=N/A speed=59.5x    
+video:11kB audio:0kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: unknown
