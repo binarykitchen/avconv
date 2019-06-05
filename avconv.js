@@ -95,7 +95,7 @@ function parseMetaData(output) {
                 metaData.start = parseFloat(metaData.start);
         } else if (/^\s*Stream #/.test(dataLine)) { // is stream meta data
             // resolve stream indices
-            tmp = dataLine.match(/#(\d+)\.(\d+)/);
+            tmp = dataLine.match(/#(\d+)[.:](\d+)/);
             if (!tmp) return;
             streamIndex = tmp.slice(1).map(getInteger);
 
@@ -111,8 +111,7 @@ function parseMetaData(output) {
 
             // prepare stream data
             tmp = dataLine.replace(/.*?(Video|Audio):/i, '').split(", ").map(function(v){
-                return v.replace(/[\[\(][^\]\)]*[\]\)]?/, '')
-                        .trim().replace(/ [\w\/]+$/, '').trim();
+                return v.trim().replace(/[ (]\S.*$/, '');
             });
 
             // parse stream data

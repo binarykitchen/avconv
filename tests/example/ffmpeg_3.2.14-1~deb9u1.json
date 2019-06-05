@@ -1,0 +1,46 @@
+{
+  "input": {
+    "duration": 30530,
+    "start": 0,
+    "bitrate": 816,
+    "stream": [
+      [
+        {
+          "type": "video",
+          "codec": "h264",
+          "format": "yuv420p",
+          "resolution": [
+            640,
+            360
+          ],
+          "bitrate": 710,
+          "fps": 30
+        },
+        {
+          "type": "audio",
+          "codec": "aac",
+          "samplerate": 48000,
+          "channels": 2,
+          "sampleformat": "fltp",
+          "bitrate": 112
+        }
+      ]
+    ]
+  },
+  "output": {
+    "stream": [
+      [
+        {
+          "type": "video",
+          "codec": "mjpeg",
+          "format": "yuvj420p",
+          "resolution": [
+            640,
+            360
+          ],
+          "bitrate": 200
+        }
+      ]
+    ]
+  }
+}
