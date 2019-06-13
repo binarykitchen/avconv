@@ -110,9 +110,11 @@ function parseMetaData(output) {
             streamData.type = tmp[0].toLowerCase();
 
             // prepare stream data
-            tmp = dataLine.replace(/.*?(Video|Audio):/i, '').split(", ").map(function(v){
-                return v.trim().replace(/[ (]\S.*$/, '');
-            });
+            tmp = dataLine.replace(/.*?(Video|Audio):/i, '')
+                .replace(/\([^)]*\)/g, '')
+                .split(", ").map(function(v){
+                    return v.trim().replace(/ \S.*$/, '');
+                });
 
             // parse stream data
             if (streamData.type == "video") {
